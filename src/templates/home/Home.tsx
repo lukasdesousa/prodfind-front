@@ -4,6 +4,7 @@ import Header from "@/components/ui/header/Header"
 import { Button } from "antd";
 import styled from "styled-components";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -14,13 +15,15 @@ export default function Home() {
           <TextArea>
             <h1>Faça negócios</h1>
             <p>Venda, compre ou troque produtos com pessoas que estão próximas a você!</p>
-            <Button style={{fontWeight: 500}} type="primary" size="large">
-              Negociar
-            </Button>
+            <Link href="/produtos/mapa">
+              <Button style={{fontWeight: 500}} type="primary" size="large">
+                Negociar
+              </Button>
+            </Link>
           </TextArea>
           <Image 
-          src={'/images/image.png'}
-          alt="Image from home"
+          src={'/images/home.png'}
+          alt="Image home"
           width={400}
           height={400}
           />
@@ -35,22 +38,17 @@ const Main = styled.main`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
 `;
 
 const Template = styled.section`
   display: flex;
   align-items: center;
   justify-content: space-around;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  margin: 10% auto;
 
   @media screen and (max-width: 1200px) {
     flex-direction: column;
     width: 80%;
-    top: 60%;
   }
 
   img {
