@@ -1,6 +1,6 @@
 'use client';
 
-import ProductsMap from "@/src/templates/products/Products";
+import ProductsMap from "@/templates/products/Products";
 
 export default function Map() {
     return (

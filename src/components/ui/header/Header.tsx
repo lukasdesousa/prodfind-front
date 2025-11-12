@@ -34,14 +34,16 @@ export default function Header() {
       <Container>
         <h1><Link href={'/'}>ProdFind</Link></h1>
         <Menu>
-          <SearchComponent />
-          {pathname !== '/produtos/mapa' && (
-            <MenuItem href={'/produtos/mapa'} className={isSmallScreen ? 'not-visible' : ''}>Mapa de produtos</MenuItem>
+          {pathname === '/marketplace' && (
+            <SearchComponent />
           )}
-          <MenuItem href={'/vender'} className={isSmallScreen ? 'not-visible' : ''}>Vender</MenuItem>
+          {pathname !== '/marketplace' && (
+            <MenuItem href={'/produtos/mapa'} className={isSmallScreen ? 'not-visible' : ''}>Marketplace</MenuItem>
+          )}
+          <MenuItem href={'/produtos/criar'} className={isSmallScreen ? 'not-visible' : ''}>Anunciar</MenuItem>
           <MenuItem href={'/suporte'} className={isSmallScreen ? 'not-visible' : ''}>Suporte</MenuItem>
         </Menu>
-        <Link href={'/login'}>
+        <Link href={'/usuario/perfil'}>
           <UserOutlined className={isSmallScreen ? 'not-visible' : ''} />
         </Link>
         <MenuOutlined className={isSmallScreen ? '' : 'not-visible'} onClick={() => showDrawer()} />
@@ -59,8 +61,8 @@ export default function Header() {
             {pathname !== '/produtos/mapa' && (
               <MenuItem style={{ textDecoration: 'none', color: 'inherit' }} href={'/produtos/mapa'}><h1>Mapa de produtos</h1></MenuItem>
             )}
-            <MenuItem style={{ textDecoration: 'none', color: 'inherit' }} href={'/sell'}><h1>Vender</h1></MenuItem>
-            <MenuItem style={{ textDecoration: 'none', color: 'inherit' }} href={'/register'}><h1>Meus Anúncios</h1></MenuItem>
+            <MenuItem style={{ textDecoration: 'none', color: 'inherit' }} href={'/entrar'}><h1>Vender</h1></MenuItem>
+            <MenuItem style={{ textDecoration: 'none', color: 'inherit' }} href={'/entrar'}><h1>Meus Anúncios</h1></MenuItem>
             <MenuItem style={{ textDecoration: 'none', color: 'inherit' }} href={'/suporte'}><h1>Contato</h1></MenuItem>
           </DrawerMenuOpts>
           <Line02 />
@@ -78,7 +80,7 @@ const Container = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 20px 0;
+    padding: 10px 0;
 
     @media screen and (max-width: 768px) {
         justify-content: space-between;

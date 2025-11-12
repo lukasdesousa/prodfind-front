@@ -1,10 +1,14 @@
 'use client';
 
-import Header, { Line, Line02, LtTitle, MenuItem } from "@/src/components/header/Header";
+import Header, { Line, Line02, LtTitle } from "@/components/ui/header/Header";
 import dynamic from "next/dynamic";
 import styled from "styled-components";
 import { Col, Drawer, InputNumber, InputNumberProps, Row, Slider } from 'antd';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppSelector } from "@/store/hooks";
+import ProductClass from "@/utils/classes/Products/Products";
+import { useDispatch } from "react-redux";
+import { setProductsNearBy } from "@/store/slices/userSlice";
 
 const Map = dynamic(() => import("./map/Map"), {
     ssr: false,
@@ -12,18 +16,37 @@ const Map = dynamic(() => import("./map/Map"), {
 
 export default function Products() {
     const [full, setFull] = useState(false);
-
-    const [inputValue, setInputValue] = useState(1);
+    const [radium_km, setRadiumKm] = useState(1);
+    const { latitude, longitude, productsNearBy } = useAppSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const productsClass = new ProductClass("");
 
     const onChange: InputNumberProps['onChange'] = (newValue) => {
-        setInputValue(newValue as number);
+        setRadiumKm(newValue as number);
     };
+
+    useEffect(() => {
+        localStorage.setItem('radium_km', String(radium_km))
+
+        const search = async () => {
+            const productsNearBy = await productsClass.get_products(latitude!, longitude!, radium_km!);
+            dispatch(setProductsNearBy(productsNearBy))
+        }
+        
+        if (latitude && longitude && radium_km) search();
+        
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [radium_km, latitude, longitude])
+    
+    useEffect(() => {
+        console.log(productsNearBy)
+    }, [productsNearBy])
 
     return (
         <>
             <Header />
             <Container>
-                <Map range={inputValue} />
+                <Map range={radium_km} />
                 <Drawer
                     placement='bottom'
                     width={500}
@@ -32,19 +55,19 @@ export default function Products() {
                     mask={full ? true : false}
                     height={full ? 'auto' : 50}
                     onClick={() => setFull(true)}
-                    open={true}
+                    open
                     style={{ transition: '1s' }}
                 >
                     <Line />
                     <DrawerContent>
-                        <h1 style={{ fontWeight: '600', textAlign: 'center' }}>Mostrar produtos em um raio de {inputValue}km</h1>
-                        <Row style={{margin: 'auto'}}>
+                        <h1 style={{ fontWeight: '600', textAlign: 'center' }}>Mostrando produtos em um raio de {radium_km}km</h1>
+                        <Row style={{ margin: 'auto' }}>
                             <Col span={12}>
                                 <Slider
                                     min={1}
                                     max={20}
                                     onChange={onChange}
-                                    value={typeof inputValue === 'number' ? inputValue : 0}
+                                    value={typeof radium_km === 'number' ? radium_km : 0}
                                 />
                             </Col>
                             <Col span={4}>
@@ -52,7 +75,7 @@ export default function Products() {
                                     min={1}
                                     max={20}
                                     style={{ margin: '0 16px' }}
-                                    value={inputValue}
+                                    value={radium_km}
                                     onChange={onChange}
                                 />
                             </Col>

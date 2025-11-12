@@ -5,6 +5,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-le
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Card from "./Card";
+import { useDispatch } from "react-redux";
+import { setLongAndLat } from "@/store/slices/userSlice";
+import { useAppSelector } from "@/store/hooks";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -14,22 +17,10 @@ L.Icon.Default.mergeOptions({
     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-const testArray = [
-    { id: 1, title: "Bicicleta", description: "Bicicleta em ótimo estado, usada por 1 ano e...", image_url: "https://example.com/bike.jpg", item_price: 980, seller_name: "Paulo Souza", latitude: -4.96764000, longitude: -40.06725000 },
-    { id: 2, title: "Notebook", description: "Notebook gamer, usado por 6 meses.", image_url: "https://example.com/laptop.jpg", item_price: 3500, seller_name: "Ana Lima", latitude: -23.551, longitude: -46.635 },
-    { id: 3, title: "Smartphone", description: "Smartphone com câmera excelente, usado por 1 ano.", image_url: "https://example.com/phone.jpg", item_price: 1200, seller_name: "Carlos Pereira", latitude: -23.552, longitude: -46.632 },
-]
-
-const productIcon = new L.Icon({
-    iconUrl: "/images/bike.webp", // caminho da imagem (pode ser PNG, SVG)
-    iconSize: [50, 50], // tamanho do ícone
-    iconAnchor: [20, 40], // ponto que “marca” a posição no mapa
-    popupAnchor: [0, -40], // posição do popup relativo ao ícone
-});
-
 function UserLocation({ range }: { range: number }) {
     const [position, setPosition] = useState<[number, number] | null>(null);
     const map = useMap();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!navigator.geolocation) return;
@@ -38,6 +29,7 @@ function UserLocation({ range }: { range: number }) {
             (pos) => {
                 const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
                 setPosition(coords);
+                dispatch(setLongAndLat({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }))
                 map.setView(coords, 15);
             },
             (err) => console.error(err),
@@ -45,7 +37,7 @@ function UserLocation({ range }: { range: number }) {
         );
 
         return () => navigator.geolocation.clearWatch(watcher);
-    }, [map]);
+    }, [map, dispatch]);
 
     return position ? (
         <>
@@ -66,6 +58,8 @@ function UserLocation({ range }: { range: number }) {
 }
 
 export default function Map({ range }: { range: number }) {
+    const { productsNearBy } = useAppSelector((state) => state.user);
+
     return (
         <MapContainer
             center={[-23.5505, -46.6333]}
@@ -79,15 +73,22 @@ export default function Map({ range }: { range: number }) {
 
             <UserLocation range={range} />
 
-            {testArray.map(product => (
-                <Marker title="Produto" key={product.id} position={[product.latitude, product.longitude]} icon={productIcon}>
+            {productsNearBy && productsNearBy.length > 0 && productsNearBy.map((item, index) => (
+                <Marker icon={new L.Icon({
+                    iconUrl: item.imagesUrl[0],
+                    iconSize: [50, 50], // tamanho do ícone
+                    iconAnchor: [20, 40], // ponto que “marca” a posição no mapa
+                    popupAnchor: [0, -40], // posição do popup relativo ao ícone
+                })} title="Produto" key={index} position={[item.latitude, item.longitude]}>
                     <Popup interactive>
                         <Card
-                            title={product.title}
-                            description={product.description}
-                            image_url={product.image_url}
-                            item_price={product.item_price}
-                            seller_name={product.seller_name}
+                            product_id={item.id}
+                            sellerId={item.sellerId}
+                            title={item.name}
+                            description={item.description}
+                            imagesUrl={item.imagesUrl[0]}
+                            item_price={item.price}
+                            seller_storename={item.storename}
                         />
                     </Popup>
                 </Marker>

@@ -1,6 +1,6 @@
 'use client';
 
-import Header from "@/src/components/header/Header"
+import Header from "@/components/ui/header/Header"
 import { Button } from "antd";
 import styled from "styled-components";
 import Image from "next/image";

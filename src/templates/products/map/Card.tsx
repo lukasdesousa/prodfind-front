@@ -1,16 +1,24 @@
 'use client';
 
 import styled from "styled-components";
-import type { CardType } from "@/src/types/CardType/CardType";
+import type { CardType } from "@/types/CardType/CardType";
 import Image from "next/image";
 import { Button } from "antd";
+import { useAppSelector } from "@/store/hooks";
+import Link from "next/link";
 
 export default function Card(data: CardType) {
+    const { id } = useAppSelector((state) => state.user);
+
     return (
         <>
             <CardContainer>
-                <Image src={"/images/bike.webp"} alt="teste"
-                    width={200} height={200} style={{margin: "15px auto"}}
+                {id && id === data.sellerId && (
+                    <p><strong>Seu anúncio</strong></p>
+                )}
+                <p><strong></strong></p>
+                <Image src={data.imagesUrl} alt="teste"
+                    width={200} height={200} style={{ margin: "15px auto" }}
                 />
                 <Info>
                     <h1 className="">{data.title}</h1>
@@ -20,8 +28,8 @@ export default function Card(data: CardType) {
                         currency: 'BRL'
                     })}</h2>
                 </Info>
-                <p>{data.seller_name}</p>
-                <Button style={{margin: '0 auto', width: '80%'}} type="primary">Ver mais </Button>
+                <p>Anunciado por <strong>{data.seller_storename}</strong></p>
+                <Link style={{width: '100%'}} href={`/produtos/info/${data.product_id}`}><Button style={{ margin: '0 auto', width: '100%' }} type="primary">Ver mais </Button></Link>
             </CardContainer>
         </>
     );
