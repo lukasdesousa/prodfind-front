@@ -7,8 +7,10 @@ export default function Loading() {
     return (
         <>
             <Container>
-                <h3>Estou obtendo os produtos próximos de você</h3>
-                <CircularProgress />
+                <Info>
+                    <h3>Estou obtendo os produtos próximos de você</h3>
+                    <CircularProgress />
+                </Info>
             </Container>
         </>
     )
@@ -29,4 +31,14 @@ const Container = styled.section`
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.208);
+`;
+
+const Info = styled.section`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    text-align: center;
+    gap: 30px;
 `;
