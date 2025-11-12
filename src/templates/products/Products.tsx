@@ -9,6 +9,9 @@ import { useAppSelector } from "@/store/hooks";
 import ProductClass from "@/utils/classes/Products/Products";
 import { useDispatch } from "react-redux";
 import { setProductsNearBy } from "@/store/slices/userSlice";
+import Loading from "@/components/ui/loading/Loading";
+import { useUserLocation } from '@/utils/functions/Location';
+import useNotification from "antd/es/notification/useNotification";
 
 const Map = dynamic(() => import("./map/Map"), {
     ssr: false,
@@ -17,13 +20,18 @@ const Map = dynamic(() => import("./map/Map"), {
 export default function Products() {
     const [full, setFull] = useState(false);
     const [radium_km, setRadiumKm] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const [api, contextHolder] = useNotification();
     const { latitude, longitude, productsNearBy } = useAppSelector((state) => state.user);
     const dispatch = useDispatch();
     const productsClass = new ProductClass("");
-
+    
     const onChange: InputNumberProps['onChange'] = (newValue) => {
         setRadiumKm(newValue as number);
     };
+
+    // Localização do usuário
+    useUserLocation();
 
     useEffect(() => {
         localStorage.setItem('radium_km', String(radium_km))
@@ -31,9 +39,18 @@ export default function Products() {
         const search = async () => {
             const productsNearBy = await productsClass.get_products(latitude!, longitude!, radium_km!);
             dispatch(setProductsNearBy(productsNearBy))
+            setLoading(false);
         }
         
-        if (latitude && longitude && radium_km) search();
+        if (latitude && longitude && radium_km) {
+            search();
+        } else {
+            api.warning({
+                message: 'Algo deu errado ao obter sua localização',
+                description: 'Por favor, verifique se você permitiu o acesso à sua localização e recarregue a página.',
+                duration: 5,
+            })
+        }
         
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [radium_km, latitude, longitude])
@@ -44,6 +61,8 @@ export default function Products() {
 
     return (
         <>
+            {contextHolder}
+            {loading && <Loading />}
             <Header />
             <Container>
                 <Map range={radium_km} />
