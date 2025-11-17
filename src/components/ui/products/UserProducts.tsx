@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSelector } from '@/store/hooks';
 import { Products } from '@/types/Products/ProductsTypes';
-import { Button, Card } from 'antd';
+import { Button, Card, Pagination } from 'antd';
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 import Meta from 'antd/es/card/Meta';
 import Image from 'next/image';
@@ -11,65 +11,93 @@ export default function UserProducts() {
     const { userProducts } = useAppSelector((state) => state.user);
     const [loading, setLoading] = useState(true);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 2; // Quantos produtos por página
+
     useEffect(() => {
         if (userProducts) {
             setLoading(false);
         }
-    }, [userProducts])
+    }, [userProducts]);
+
+    // Cálculo dos produtos da página atual
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedProducts = userProducts?.slice(startIndex, endIndex) || [];
 
     return (
-        <>
-            <Container>
-                {userProducts && userProducts.length > 0 ? userProducts.map((product: Products, index: number) => (
-                    <div key={index}>
-                        <Card
-                            loading={loading}
-                            style={{ width: 300 }}
-                            cover={
-                                <Image
-                                    draggable={true}
-                                    width={200}
-                                    height={200}
-                                    style={{ width: '100%', height: 'auto' }}
-                                    alt="Imagem capa do anúncio"
-                                    src={product.imagesUrl[0]}
-                                    quality={100}
-                                />
-                            }
-                            actions={[
-                                <SettingOutlined key="setting" />,
-                                <EditOutlined key="edit" />,
-                                <EllipsisOutlined key="ellipsis" />,
-                            ]}
-                        >
-                            <Meta
-                                title={product.name}
-                                description={product.description}
-                            />
-                        </Card>
-                    </div>
-                )) : (
-                    <SubContainer>
-                        <h2>Você ainda não anunciou produtos.</h2>
-                        <Button type='primary' size='large'>Anunciar</Button>
-                    </SubContainer>
-                )}
-            </Container>
-        </>
-    )
+        <Container>
+            <h2>Seus anúncios</h2>
+            {userProducts && userProducts.length > 0 ? (
+                <>
+                    <ProductsContainer>
+                        {paginatedProducts.map((product: Products, index: number) => (
+                            <Card
+                                key={index}
+                                loading={loading}
+                                style={{ width: 300 }}
+                                cover={
+                                    <Image
+                                        draggable={true}
+                                        width={200}
+                                        height={200}
+                                        style={{ width: '100%', height: 'auto' }}
+                                        alt="Imagem capa do anúncio"
+                                        src={product.imagesUrl[0]}
+                                        quality={100}
+                                    />
+                                }
+                                actions={[
+                                    <SettingOutlined key="setting" />,
+                                    <EditOutlined key="edit" />,
+                                    <EllipsisOutlined key="ellipsis" />,
+                                ]}
+                            >
+                                <Meta title={product.name} description={product.description} />
+                            </Card>
+                        ))}
+                    </ProductsContainer>
+
+                    <PaginationContainer>
+                        <Pagination
+                            current={currentPage}
+                            total={userProducts.length}
+                            pageSize={pageSize}
+                            onChange={(page) => setCurrentPage(page)}
+                        />
+                    </PaginationContainer>
+                </>
+            ) : (
+                <SubContainer>
+                    <h2>Você ainda não anunciou produtos.</h2>
+                    <Button type='primary' size='large'>Anunciar</Button>
+                </SubContainer>
+            )}
+        </Container>
+    );
 }
 
 const Container = styled.section`
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
     margin: auto;
-    padding: 50px 0px;
+    padding: 50px 0;
 
     h2 {
-        font-size: 1.3rem;
         text-align: center;
+        margin-bottom: 50px;
     }
+`;
+
+const ProductsContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+`;
+
+const PaginationContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 `;
 
 const SubContainer = styled.div`

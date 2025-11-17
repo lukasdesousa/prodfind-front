@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import ProductClass from '@/utils/classes/Products/Products';
 import { Button, Form, GetProp, Input, Select, Steps, theme, Upload, Image, UploadFile, UploadProps, InputNumber } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import SelectLocationMap from './location/LocationSelect';
 import Header from '@/components/ui/header/Header';
 import styled from 'styled-components';
 import TextArea from 'antd/es/input/TextArea';
@@ -172,6 +173,20 @@ export default function ProductsCreate() {
         },
         {
             title: '5º',
+            fields: ['location'],
+            content: (
+                <Form.Item
+                style={{width: '80vw', maxWidth: '400px'}}
+                    label="Localização"
+                    name="location"
+                    extra="Selecione a localização do produto no mapa"
+                >
+                    <SelectLocationMap />
+                </Form.Item>
+            ),
+        },
+        {
+            title: '6º',
             fields: ['price'],
             content: (
                 <Form.Item
@@ -210,7 +225,7 @@ export default function ProductsCreate() {
             ),
         },
         {
-            title: '6º',
+            title: '7º',
             fields: ['preferences'],
             content: (
                 <Form.Item
@@ -288,7 +303,19 @@ export default function ProductsCreate() {
                 fileList.map((file) => {
                     if (file.thumbUrl) base64Images.push(file.thumbUrl)
                 })
-            } 
+            }
+
+            const product_lat = localStorage.getItem("product_lat");
+            const product_lon = localStorage.getItem("product_lon");
+
+            if (!product_lat || !product_lon) {
+                return api.error({
+                    message: 'Erro',
+                    description: 'É necessário selecionar a localização do produto no mapa.',
+                    duration: 5,
+                    showProgress: true,
+                })
+            }
 
             try {
                 const res = await productClass.create_product({
@@ -298,8 +325,8 @@ export default function ProductsCreate() {
                     stock: values.stock,
                     price: Number(values.price),
                     preferences: values.preferences,
-                    latitude: latitude!,
-                    longitude: longitude!,
+                    latitude: Number(product_lat),
+                    longitude: Number(product_lon),
                 })
 
                 if (res.success) {
@@ -309,7 +336,13 @@ export default function ProductsCreate() {
                         duration: 5,
                         showProgress: true,
                     })
-                    console.log(res.data)
+                    localStorage.removeItem("formData");
+                    localStorage.removeItem("currentStep");
+                    localStorage.removeItem("product_lat");
+                    localStorage.removeItem("product_lon");
+                    form.resetFields();
+                    setFileList([]);
+                    setCurrent(0);
                 }
             } catch (error) {
                 console.error(error);

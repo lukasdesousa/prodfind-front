@@ -3,9 +3,10 @@ import styled from "styled-components";
 import Image from "next/image";
 import { useAppSelector } from "@/store/hooks";
 import UserProducts from "@/components/ui/products/UserProducts";
+import LogOut from "@/components/ui/buttons/logout/Logout";
 
 export default function UserHome() {
-    const { name } = useAppSelector((state) => state.user);
+    const { name, email } = useAppSelector((state) => state.user);
 
     return (
         <>
@@ -20,13 +21,14 @@ export default function UserHome() {
                         style={{ borderRadius: '50%', height: 'auto', width: '80vw', maxWidth: '100px', border: '2px solid black', paddingTop: '2px' }}
                     />
                 <MainInfo>
-                    <h1>Olá, {name}.</h1>
-                    <p>lukas@email.com</p>
+                    <h1>{name}</h1>
+                    <p>{email}</p>
                 </MainInfo>
                 </UserInfo>
                 <ProductsSection>
                     <UserProducts />
                 </ProductsSection>
+                <LogOut />
             </Container>
         </>
     )
