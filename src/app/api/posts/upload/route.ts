@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const base64Files: string[] = body.files;
 
     if (!Array.isArray(base64Files) || base64Files.length === 0) {
-      return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
+      return NextResponse.json({ result: "Nenhum arquivo enviado." }, { status: 400 });
     }
 
     const uploadedUrls: string[] = [];

@@ -26,7 +26,18 @@ export type Products = {
 export type CreateProductsForm = {
     name: string;
     description: string;
-    images: UploadFile[]
+    images: UploadFile[];
+    stock: number;
+    price: number;
+    preferences: number;
+    latitude: number;
+    longitude: number;
+}
+
+export type UpdateProductsForm = {
+    name: string;
+    description: string;
+    images: UploadFile[];
     stock: number;
     price: number;
     preferences: number;

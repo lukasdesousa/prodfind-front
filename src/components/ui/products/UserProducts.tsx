@@ -6,6 +6,7 @@ import { Button, Card, Pagination } from 'antd';
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 import Meta from 'antd/es/card/Meta';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function UserProducts() {
     const { userProducts } = useAppSelector((state) => state.user);
@@ -49,7 +50,7 @@ export default function UserProducts() {
                                 }
                                 actions={[
                                     <SettingOutlined key="setting" />,
-                                    <EditOutlined key="edit" />,
+                                    <Link key={index} href={`/produtos/atualizar/${product.id}`}><EditOutlined key="edit" /></Link>,
                                     <EllipsisOutlined key="ellipsis" />,
                                 ]}
                             >

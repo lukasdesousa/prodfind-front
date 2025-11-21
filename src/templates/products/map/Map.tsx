@@ -19,6 +19,7 @@ L.Icon.Default.mergeOptions({
 
 function UserLocation({ range }: { range: number }) {
     const [position, setPosition] = useState<[number, number] | null>(null);
+    const [initialized, setInitialized] = useState(false);
     const map = useMap();
     const dispatch = useDispatch();
 
@@ -30,6 +31,12 @@ function UserLocation({ range }: { range: number }) {
                 const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
                 setPosition(coords);
                 dispatch(setLongAndLat({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }))
+
+                if (!initialized) {
+                    map.setView(coords, 15);
+                    setInitialized(true);
+                }
+
                 map.setView(coords, 15);
             },
             (err) => console.error(err),
@@ -37,7 +44,7 @@ function UserLocation({ range }: { range: number }) {
         );
 
         return () => navigator.geolocation.clearWatch(watcher);
-    }, [map, dispatch]);
+    }, [map, dispatch, initialized]);
 
     return position ? (
         <>
