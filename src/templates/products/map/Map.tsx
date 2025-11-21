@@ -23,21 +23,24 @@ function UserLocation({ range }: { range: number }) {
     const map = useMap();
     const dispatch = useDispatch();
 
-    useEffect(() => {
+     useEffect(() => {
         if (!navigator.geolocation) return;
 
         const watcher = navigator.geolocation.watchPosition(
             (pos) => {
                 const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
                 setPosition(coords);
-                dispatch(setLongAndLat({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }))
 
+                dispatch(setLongAndLat({
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude
+                }));
+
+                // Só centraliza a primeira vez
                 if (!initialized) {
                     map.setView(coords, 15);
                     setInitialized(true);
                 }
-
-                map.setView(coords, 15);
             },
             (err) => console.error(err),
             { enableHighAccuracy: true }

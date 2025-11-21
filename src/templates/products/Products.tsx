@@ -22,6 +22,7 @@ export default function Products() {
     const [radium_km, setRadiumKm] = useState(1);
     const [loading, setLoading] = useState(true);
     const [api, contextHolder] = useNotification();
+    const [searched, setSearched] = useState(false);
     const { latitude, longitude, productsNearBy } = useAppSelector((state) => state.user);
     const dispatch = useDispatch();
     const productsClass = new ProductClass("");
@@ -39,12 +40,13 @@ export default function Products() {
         const search = async () => {
             const productsNearBy = await productsClass.get_products(latitude!, longitude!, radium_km!);
             dispatch(setProductsNearBy(productsNearBy))
+            setSearched(true);
             setLoading(false);
         }
         
-        if (latitude && longitude && radium_km) {
+        if (latitude && longitude && radium_km && !searched) {
             search();
-        } else {
+        } else if (!latitude || !longitude || !radium_km) {
             api.warning({
                 message: 'Algo deu errado ao obter sua localização',
                 description: 'Por favor, verifique se você permitiu o acesso à sua localização e recarregue a página.',
