@@ -139,4 +139,25 @@ export default class ProductClass {
       throw new Error(`Erro ao atualizar produto: ${(error as Error).message}`);
     }
   }
+
+  async delete(product_id: number) {
+    try {
+      const response = await fetch(`/api/posts/products/delete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ product_id }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao deletar produto: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw new Error(`Erro interno ao deletar produto", ${(error as Error).message}`);
+    }
+  }
 }

@@ -1,16 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import ProductClass from '@/utils/classes/Products/Products';
 import { useAppSelector } from '@/store/hooks';
 import { Products } from '@/types/Products/ProductsTypes';
 import { Button, Card, Pagination } from 'antd';
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import Meta from 'antd/es/card/Meta';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Modal } from 'antd';
 
 export default function UserProducts() {
     const { userProducts } = useAppSelector((state) => state.user);
     const [loading, setLoading] = useState(true);
+    const [modal, contextHolder] = Modal.useModal();
+    const product = new ProductClass("");
+
+    const confirm = (id: number) => {
+        modal.confirm({
+            title: 'Confirm',
+            icon: <ExclamationCircleOutlined />,
+            content: 'Deseja excluir este anúncio?',
+            okText: 'Excluir',
+            cancelText: 'Cancelar',
+            async onOk() {
+                await product.delete(id);
+                window.location.reload();
+            },
+        });
+    };
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 2; // Quantos produtos por página
@@ -49,14 +67,15 @@ export default function UserProducts() {
                                     />
                                 }
                                 actions={[
-                                    <SettingOutlined key="setting" />,
+                                    <DeleteOutlined onClick={() => confirm(product.id)} style={{ color: 'red' }} key="delete" />,
                                     <Link key={index} href={`/produtos/atualizar/${product.id}`}><EditOutlined key="edit" /></Link>,
-                                    <EllipsisOutlined key="ellipsis" />,
                                 ]}
                             >
                                 <Meta title={product.name} description={product.description} />
                             </Card>
                         ))}
+
+                        {contextHolder}
                     </ProductsContainer>
 
                     <PaginationContainer>
