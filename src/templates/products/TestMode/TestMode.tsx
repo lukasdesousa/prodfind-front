@@ -3,7 +3,7 @@
 import Header, { Line, Line02, LtTitle } from "@/components/ui/header/Header";
 import dynamic from "next/dynamic";
 import styled from "styled-components";
-import { Button, Col, Drawer, InputNumber, InputNumberProps, Row, Slider } from 'antd';
+import { Col, Drawer, InputNumber, InputNumberProps, Row, Slider } from 'antd';
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/store/hooks";
 import ProductClass from "@/utils/classes/Products/Products";
@@ -12,9 +12,8 @@ import { setProductsNearBy } from "@/store/slices/userSlice";
 import Loading from "@/components/ui/loading/Loading";
 import { useUserLocation } from '@/utils/functions/Location';
 import useNotification from "antd/es/notification/useNotification";
-import { useRouter } from "next/navigation";
 
-const Map = dynamic(() => import("./map/Map"), {
+const Map = dynamic(() => import("./map/TestModeMap"), {
     ssr: false,
 });
 
@@ -24,9 +23,8 @@ export default function Products() {
     const [loading, setLoading] = useState(true);
     const [api, contextHolder] = useNotification();
     const [searched, setSearched] = useState(false);
-    const { latitude, longitude, productsNearBy } = useAppSelector((state) => state.user);
+    const { latitude, longitude } = useAppSelector((state) => state.user);
     const dispatch = useDispatch();
-    const router = useRouter();
     const productsClass = new ProductClass("");
 
     const onChange: InputNumberProps['onChange'] = (newValue) => {
@@ -57,45 +55,6 @@ export default function Products() {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [radium_km, latitude, longitude])
-
-    useEffect(() => {
-        if (productsNearBy.length === 0 && !loading) {
-            const key = `prodfind_${Date.now()}`;
-            
-            api.info({
-                key,
-                message: 'Nenhum produto encontrado',
-                description:
-                'Não foi encontrado nenhum produto próximo. Deseja ir ao modo teste do prodfind?',
-                duration: 0,
-                actions: [
-                    <>
-                        <Button
-                            type="primary"
-                            size="middle"
-                            onClick={() => {
-                                router.push('/produtos/mapa/teste');
-                                api.destroy(key);
-                            }}
-                            >
-                            Sim
-                        </Button>
-
-                        <Button
-                            size="middle"
-                            style={{ marginLeft: 8 }}
-                            onClick={() => {
-                                api.destroy(key);
-                            }}
-                        >
-                            Não
-                        </Button>
-                    </>
-                ],
-            });
-        };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loading])
 
 return (
     <>
