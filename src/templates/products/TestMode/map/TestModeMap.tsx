@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -68,6 +68,30 @@ function UserLocation({ range }: { range: number }) {
     ) : null;
 }
 
+function distanceInMeters(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+) {
+    const R = 6371000; // raio da Terra em metros
+    const toRad = (v: number) => (v * Math.PI) / 180;
+
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+}
+
 function randomNearbyLocation(
     lat: number,
     lng: number,
@@ -92,15 +116,14 @@ function randomNearbyLocation(
 export default function Map({ range }: { range: number }) {
     const [products, setProducts] = useState<TestModeProduct[]>([]);
     const { latitude, longitude } = useAppSelector((state) => state.user);
+    const lastBasePosition = useRef<{ lat: number; lng: number } | null>(null);
 
-    useEffect(() => {
-        if (!latitude || !longitude) return;
-
+    function createProducts(baseLat: number, baseLng: number) {
         const baseProducts = [
             {
                 id: 1,
-                imageSrc: ['/images/bike.webp'],
-                title: 'PlayStation 5 Seminkovo',
+                imageSrc: ['/images/ps5-testmode.png'],
+                title: 'PlayStation 5 Seminovo',
                 description: 'Console PlayStation 5 em ótimo estado.',
                 price: 2500,
                 storename: 'João Guedes',
@@ -108,58 +131,102 @@ export default function Map({ range }: { range: number }) {
             },
             {
                 id: 2,
-                imageSrc: ['/images/bike.webp'],
-                title: 'PlayStation 5 Seminovo',
-                description: 'Console PlayStation 5 em ótimo estado.',
-                storename: 'Lukas de Souza',
-                price: 2500,
+                imageSrc: ['/images/galaxy-testmode.webp'],
+                title: 'Smartphone Samsung Galaxy',
+                description: 'Smartphone Samsung Galaxy em ótimo estado.',
+                price: 2100,
+                storename: 'Paulo Silva',
                 stock: 1,
             },
             {
                 id: 3,
-                imageSrc: ['/images/bike.webp'],
-                title: 'PlayStation 5 Seminovo',
-                description: 'Console PlayStation 5 em ótimo estado.',
-                storename: 'Maria Silva',
-                price: 2500,
+                imageSrc: ['/images/notebook-testmode.avif'],
+                title: 'Notebook Dell Inspiron',
+                description: 'Notebook Dell Inspiron em ótimo estado.',
+                price: 3800,
+                storename: 'Lukas de Souza',
                 stock: 1,
             },
             {
                 id: 4,
-                imageSrc: ['/images/bike.webp'],
-                title: 'PlayStation 5 Seminovo',
-                description: 'Console PlayStation 5 em ótimo estado.',
-                storename: 'Carlos Pereira',
-                price: 2500,
+                imageSrc: ['/images/panela-testmode.png'],
+                title: 'Panela de pressão',
+                description: 'Panela de pressão em ótimo estado.',
+                price: 240,
+                storename: 'Joana Mendes',
                 stock: 1,
             },
             {
                 id: 5,
-                imageSrc: ['/images/bike.webp'],
-                title: 'PlayStation 5 Seminovo',
-                description: 'Console PlayStation 5 em ótimo estado.',
-                storename: 'Ana Costa',
-                price: 2500,
+                imageSrc: ['/images/fone-testmode.avif'],
+                title: 'Fones de ouvido',
+                description: 'Fones de ouvido em ótimo estado.',
+                price: 800,
+                storename: 'Lojinha do Davi',
                 stock: 1,
             },
+            {
+                id: 6,
+                imageSrc: ['/images/camisa-testmode.webp'],
+                title: 'Camiseta Polo',
+                description: 'Camiseta Polo em ótimo estado.',
+                price: 200,
+                storename: 'Marcos Paulo',
+                stock: 1,
+            },
+            {
+                id: 7,
+                imageSrc: ['/images/tvsamsung-testmode.webp'],
+                title: 'TV Samsung 4K',
+                description: 'TV Samsung 4K em ótimo estado.',
+                price: 3850,
+                storename: 'Ana Clara',
+                stock: 1,
+            },
+            
         ];
 
         const productsWithLocation = baseProducts.map((product, index) => {
-            const { latitude: lat, longitude: lng } = randomNearbyLocation(
-                latitude,
-                longitude,
-                200 + index * 120 // espalha naturalmente
+            const { latitude, longitude } = randomNearbyLocation(
+                baseLat,
+                baseLng,
+                200 + index * 120
             );
 
             return {
                 ...product,
                 imageSrc: product.imageSrc[0],
-                latitude: lat,
-                longitude: lng,
+                latitude,
+                longitude,
             };
         });
 
         setProducts(productsWithLocation);
+    }
+
+    useEffect(() => {
+        if (!latitude || !longitude) return;
+
+        // primeira vez → sempre cria
+        if (!lastBasePosition.current) {
+            lastBasePosition.current = { lat: latitude, lng: longitude };
+            createProducts(latitude, longitude);
+            return;
+        }
+
+        const distance = distanceInMeters(
+            lastBasePosition.current.lat,
+            lastBasePosition.current.lng,
+            latitude,
+            longitude
+        );
+
+        // limiar: ajuste como quiser
+        if (distance < 80) return;
+
+        // movimento real detectado
+        lastBasePosition.current = { lat: latitude, lng: longitude };
+        createProducts(latitude, longitude);
     }, [latitude, longitude]);
 
     return (
@@ -184,6 +251,7 @@ export default function Map({ range }: { range: number }) {
                 })} title="Produto" key={index} position={[item.latitude!, item.longitude!]}>
                     <Popup interactive>
                         <Card
+                            key={index}
                             id={item.id}
                             title={item.title}
                             description={item.description}
