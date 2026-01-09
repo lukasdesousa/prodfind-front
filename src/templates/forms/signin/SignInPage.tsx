@@ -95,7 +95,7 @@ export default function SignInPage() {
 
             <Title style={styles.title}>Entre</Title>
             <Text style={styles.text}>
-              Entre em sua conta para conversar com vendedores ou anúnciar um produto.
+              Entre em sua conta para anúnciar um produto.
             </Text>
           </div>
           <Form

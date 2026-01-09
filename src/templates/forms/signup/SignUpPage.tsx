@@ -95,7 +95,7 @@ export default function SignUpPage() {
 
             <Title style={styles.title}>Cadastre-se</Title>
             <Text style={styles.text}>
-              Junte-se a nós! Venda, troque e compre produtos próximos com a ProdFind.
+              Junte-se a nós! Venda, troque e compre produtos próximos.
             </Text>
           </div>
           <Form
