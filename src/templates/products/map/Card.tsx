@@ -18,7 +18,7 @@ export default function Card(data: CardType) {
                 )}
                 <p><strong></strong></p>
                 <Image src={data.imagesUrl} alt="teste"
-                    width={200} height={200} style={{ margin: "15px auto" }}
+                    width={200} height={200} style={{ margin: "15px auto", height: "auto" }}
                 />
                 <Info>
                     <h1 className="">{data.title}</h1>
@@ -29,7 +29,7 @@ export default function Card(data: CardType) {
                     })}</h2>
                 </Info>
                 <p>Anunciado por <strong>{data.seller_storename}</strong></p>
-                <Link style={{width: '100%'}} href={`/produtos/info/${data.product_id}`}><Button style={{ margin: '0 auto', width: '100%' }} type="primary">Ver mais </Button></Link>
+                <Link style={{ width: '100%' }} href={`/produtos/info/${data.product_id}`}><Button style={{ margin: '0 auto', width: '100%' }} type="primary">Ver mais </Button></Link>
             </CardContainer>
         </>
     );
