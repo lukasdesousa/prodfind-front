@@ -21,7 +21,7 @@ export default function Card({
                 alt={title}
                 width={200}
                 height={200}
-                style={{ margin: "15px auto" }}
+                style={{ margin: "15px auto", height: "auto" }}
             />
 
             <Info>
@@ -40,7 +40,7 @@ export default function Card({
             </p>
 
             <Link style={{ width: "100%" }} href={`/produtos/info/${id}`}>
-                <Button style={{ width: "100%" }} type="primary">
+                <Button disabled style={{ width: "100%" }} type="primary">
                     Ver mais
                 </Button>
             </Link>

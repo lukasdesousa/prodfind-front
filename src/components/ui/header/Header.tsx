@@ -9,6 +9,7 @@ import { MenuOutlined } from "@ant-design/icons";
 import { useMediaQuery } from '@mui/material';
 import { useEffect, useState } from "react";
 import { Drawer } from 'antd';
+import DevWarn from "./warns/DevWarn";
 
 export default function Header() {
   const pathname = usePathname();
@@ -31,6 +32,7 @@ export default function Header() {
 
   return (
     <>
+    <DevWarn />
       <Container>
         <h1><Link href={'/'}>ProdFind</Link></h1>
         <Menu>
